@@ -165,4 +165,6 @@ COMPANY_DOMAIN_MAP = {
 
 SCRAPE_INTERVAL_HOURS = 6
 GMAIL_CHECK_INTERVAL_HOURS = 6
-DATABASE_URL = "sqlite:///./jobhunt.db"
+
+import os
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./jobhunt.db")

@@ -1,0 +1,9 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+jobhunt/__pycache__
+jobhunt/*.db
+jobhunt/token.json
+jobhunt/credentials.json
+jobhunt/.env
