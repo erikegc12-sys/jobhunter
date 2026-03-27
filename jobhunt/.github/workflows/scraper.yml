@@ -1,0 +1,44 @@
+name: Scrape Jobs
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours
+  workflow_dispatch:          # manual trigger button
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        working-directory: jobhunt
+        run: |
+          pip install aiohttp playwright sqlalchemy
+          playwright install chromium --with-deps
+
+      - name: Run scrapers
+        working-directory: jobhunt
+        run: python scrape_ci.py
+
+      - name: Commit updated jobs.json
+        working-directory: jobhunt
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/jobs.json
+          git diff --cached --quiet || git commit -m "chore: update jobs snapshot [skip ci]"
+          git push
