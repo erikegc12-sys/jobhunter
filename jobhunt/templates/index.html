@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>jobhunt</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f18;--s1:#13151f;--s2:#1a1d2a;--s3:#22253a;
+  --b:#252840;--accent:#7c6af7;--a2:#5eead4;
+  --txt:#e2e8f0;--muted:#64748b;
+  --green:#22c55e;--red:#ef4444;--blue:#60a5fa;
+  --gold:#fbbf24;--purple:#c4b5fd;
+}
+body{background:var(--bg);color:var(--txt);font:14px/1.5 'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+/* ── Header ── */
+header{background:var(--s1);border-bottom:1px solid var(--b);padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-1px}
+.logo b{color:var(--a2)}
+.hright{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{font-size:11px;color:var(--muted);padding:4px 10px;background:var(--s2);border-radius:20px}
+.pill.ok{color:var(--green)}
+.pill.warn{color:var(--gold)}
+button{cursor:pointer;border:none;border-radius:6px;font-size:12px;font-weight:700;
+  padding:6px 14px;transition:opacity .15s;letter-spacing:.3px}
+button:hover{opacity:.8}
+button:disabled{opacity:.4;cursor:not-allowed}
+.btn-p{background:var(--accent);color:#fff}
+.btn-g{background:#0f2a1e;color:var(--a2);border:1px solid #1a3d2a}
+.btn-sm{padding:3px 9px;font-size:11px;font-weight:600}
+.btn-save{background:#1a2f4a;color:var(--blue)}
+.btn-app{background:#0f2a1a;color:var(--green)}
+.btn-dis{background:#2a1010;color:var(--red)}
+.btn-cl{background:#1e1040;color:var(--purple);border:1px solid #2d1860}
+.btn-gmail{background:#1a1200;color:var(--gold);border:1px solid #2e2000}
+
+/* ── Stats bar ── */
+.stats{display:flex;gap:1px;background:var(--b);border-bottom:1px solid var(--b);overflow-x:auto}
+.stat{background:var(--s1);padding:14px 20px;flex:1;min-width:100px;cursor:pointer;
+  transition:background .15s;text-align:center;border-right:1px solid var(--b)}
+.stat:hover{background:var(--s2)}
+.stat:last-child{border-right:none}
+.stat-n{font-size:26px;font-weight:800;line-height:1}
+.stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.stat-n.accent{color:var(--accent)}
+.stat-n.green{color:var(--green)}
+.stat-n.gold{color:var(--gold)}
+.stat-n.blue{color:var(--blue)}
+
+/* ── Filters ── */
+.filters{padding:14px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  border-bottom:1px solid var(--b);background:var(--s1)}
+.chip{padding:5px 14px;border-radius:20px;border:1px solid var(--b);background:var(--s2);
+  color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:var(--accent);color:var(--txt)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.active.gold{background:#5a3800;border-color:var(--gold);color:var(--gold)}
+
+/* ── Main ── */
+main{max-width:1400px;margin:0 auto;padding:20px 24px}
+
+/* ── Replied section ── */
+.replied-section{margin-bottom:28px}
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--b)}
+.replied-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.replied-card{background:linear-gradient(135deg,#1a1400 0%,var(--s2) 100%);
+  border:1px solid #3a2800;border-left:3px solid var(--gold);border-radius:10px;padding:14px 16px}
+.replied-company{font-weight:700;font-size:15px;color:var(--txt)}
+.replied-title{font-size:12px;color:var(--muted);margin-top:2px}
+.replied-email{margin-top:10px;padding:8px 10px;background:#0d0a00;border-radius:6px;
+  border:1px solid #2e2000}
+.replied-subject{font-size:12px;color:var(--gold);font-style:italic}
+.replied-from{font-size:11px;color:var(--muted);margin-top:2px}
+.replied-date{font-size:11px;color:var(--muted);margin-top:6px}
+.replied-actions{display:flex;gap:6px;margin-top:10px}
+
+/* ── Job cards ── */
+.jobs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.jobs-count{font-size:12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.card{background:var(--s1);border:1px solid var(--b);border-radius:10px;
+  padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s}
+.card:hover{border-color:var(--accent)}
+.card.status-replied{border-left:3px solid var(--gold);background:linear-gradient(135deg,#12100000 0%,var(--s1) 40%)}
+.card.status-applied{border-left:3px solid var(--green)}
+.card.status-dismissed{opacity:.35}
+.card-top{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.card-title{font-weight:700;font-size:14px;line-height:1.3}
+.card-title a{color:var(--txt);text-decoration:none}
+.card-title a:hover{color:var(--accent)}
+.card-company{font-size:12px;color:var(--muted)}
+.card-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.card-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.b-cat-cin{background:#2e1065;color:#c4b5fd}
+.b-cat-vid{background:#0c1a2e;color:#7dd3fc}
+.b-cat-mot{background:#0f2a1a;color:#6ee7b7}
+.b-cat-soc{background:#2a1020;color:#f9a8d4}
+.b-reg-br{background:#14532d;color:var(--green)}
+.b-reg-rem{background:#1d3a5f;color:var(--blue)}
+.b-reg-int{background:#2d1f00;color:#fb923c}
+.b-lv-jr{background:#0f2010;color:#86efac}
+.b-lv-mid{background:#1a1a10;color:#fde68a}
+.b-lv-sr{background:#200c10;color:#fca5a5}
+.b-plat{background:#1e2040;color:#a5b4fc}
+.b-status-new{background:var(--s3);color:var(--muted)}
+.b-status-saved{background:#1d3a5f;color:var(--blue)}
+.b-status-applied{background:#14532d;color:var(--green)}
+.b-status-replied{background:#3d2e00;color:var(--gold)}
+.b-status-dismissed{background:#2a1010;color:var(--red)}
+
+/* ── Empty state ── */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty h3{font-size:18px;margin-bottom:8px;color:var(--txt)}
+
+/* ── Modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
+  z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--s1);border:1px solid var(--b);border-radius:12px;
+  width:100%;max-width:600px;max-height:88vh;display:flex;flex-direction:column;
+  transform:translateY(16px);transition:transform .2s}
+.overlay.open .modal{transform:translateY(0)}
+.mhead{padding:16px 20px;border-bottom:1px solid var(--b);display:flex;
+  align-items:flex-start;justify-content:space-between;gap:12px}
+.mtitle{font-weight:700;font-size:15px}
+.msub{font-size:11px;color:var(--muted);margin-top:3px}
+.mclose{background:none;border:none;color:var(--muted);font-size:22px;line-height:1;
+  cursor:pointer;padding:0;flex-shrink:0}
+.mclose:hover{color:var(--txt);opacity:1}
+.mbody{padding:20px;overflow-y:auto;flex:1}
+.cl-text{font:14px/1.8 Georgia,serif;color:var(--txt);white-space:pre-wrap}
+.cl-load{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.cl-err{color:var(--red);font-size:13px}
+.mfoot{padding:12px 20px;border-top:1px solid var(--b);display:flex;gap:8px;justify-content:flex-end}
+.btn-copy{background:var(--s3);color:var(--txt);border:1px solid var(--b)}
+.btn-copy.ok{background:#0f2a1a;color:var(--green);border-color:#1a4a28}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--b);
+  border-radius:8px;padding:10px 16px;font-size:13px;opacity:0;transform:translateY(8px);
+  transition:all .25s;z-index:999;max-width:300px}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ── Spinner ── */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;
+  border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">job<b>hunt</b></div>
+  <div class="hright">
+    <span class="pill" id="pScrape">Scraper: idle</span>
+    <span class="pill" id="pGmail">Gmail: —</span>
+    <button class="btn-g" id="btnGmail" onclick="triggerGmail()">Check Gmail</button>
+    <button class="btn-p" id="btnScrape" onclick="triggerScrape()">Run Scraper</button>
+  </div>
+</header>
+
+<!-- Stats bar -->
+<div class="stats" id="statsBar">
+  <div class="stat" onclick="setChip('all')"><div class="stat-n accent" id="sTotal">—</div><div class="stat-l">Total</div></div>
+  <div class="stat" onclick="setChip('replied')"><div class="stat-n gold" id="sReplied">—</div><div class="stat-l">✉ Replied</div></div>
+  <div class="stat" onclick="setChip('applied')"><div class="stat-n green" id="sApplied">—</div><div class="stat-l">Applied</div></div>
+  <div class="stat" onclick="setChip('br')"><div class="stat-n blue" id="sBR">—</div><div class="stat-l">Brasil</div></div>
+  <div class="stat" onclick="setChip('cin')"><div class="stat-n" id="sCin">—</div><div class="stat-l">Cinematics</div></div>
+  <div class="stat" onclick="setChip('vid')"><div class="stat-n" id="sVid">—</div><div class="stat-l">Video Editor</div></div>
+  <div class="stat" onclick="setChip('mot')"><div class="stat-n" id="sMot">—</div><div class="stat-l">Motion</div></div>
+</div>
+
+<!-- Filter chips -->
+<div class="filters">
+  <span class="chip active" data-chip="all" onclick="setChip('all')">All</span>
+  <span class="chip" data-chip="cin" onclick="setChip('cin')">🎬 Cinematics</span>
+  <span class="chip" data-chip="vid" onclick="setChip('vid')">🎞 Video Editor</span>
+  <span class="chip" data-chip="mot" onclick="setChip('mot')">✨ Motion</span>
+  <span class="chip" data-chip="games" onclick="setChip('games')">🎮 Games</span>
+  <span class="chip" data-chip="br" onclick="setChip('br')">🇧🇷 BR</span>
+  <span class="chip" data-chip="gringa" onclick="setChip('gringa')">🌎 Gringa</span>
+  <span class="chip gold" data-chip="replied" onclick="setChip('replied')">✉ Replied</span>
+</div>
+
+<main>
+  <!-- Replied section -->
+  <div class="replied-section" id="repliedSection" style="display:none">
+    <div class="section-title">✉ Replied — companies that contacted you</div>
+    <div class="replied-grid" id="repliedGrid"></div>
+  </div>
+
+  <!-- Jobs -->
+  <div class="jobs-header">
+    <div class="jobs-count" id="jobsCount">Loading...</div>
+  </div>
+  <div class="cards" id="cards">
+    <div class="empty"><h3>Loading...</h3></div>
+  </div>
+</main>
+
+<!-- Cover letter modal -->
+<div class="overlay" id="clOverlay" onclick="closeCL(event)">
+  <div class="modal">
+    <div class="mhead">
+      <div><div class="mtitle">Cover Letter</div><div class="msub" id="clSub"></div></div>
+      <button class="mclose" onclick="closeCL(null)">×</button>
+    </div>
+    <div class="mbody" id="clBody"><div class="cl-load"><span class="spin"></span>Generating with Claude...</div></div>
+    <div class="mfoot">
+      <button class="btn-sm btn-copy" id="btnCopy" onclick="copyLetter()" style="display:none">Copy</button>
+      <button class="btn-sm btn-dis" onclick="closeCL(null)">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+let activeChip = 'all';
+let allJobs = [];
+let letterText = '';
+let scrapePoller, gmailPoller;
+
+// ── Helpers ──────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+function toast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show';
+  setTimeout(()=>t.className='toast',dur);
+}
+function fmtDate(iso){
+  if(!iso)return'—';
+  return new Date(iso.endsWith('Z')?iso:iso+'Z').toLocaleDateString('pt-BR');
+}
+
+// ── Badges ───────────────────────────────────────────────
+function catBadge(c){
+  const map={'Cinematic Artist':['b-cat-cin','Cinematic'],'Video Editor':['b-cat-vid','Video Ed.'],
+    'Motion Designer':['b-cat-mot','Motion'],'Social Media Editor':['b-cat-soc','Social']};
+  const [cls,label]=(map[c]||['b-plat',c]);
+  return`<span class="badge ${cls}">${esc(label)}</span>`;
+}
+function regionBadge(r){
+  if(r==='BR')return'<span class="badge b-reg-br">🇧🇷 BR</span>';
+  if(r==='Remote')return'<span class="badge b-reg-rem">Remote</span>';
+  return'<span class="badge b-reg-int">Intl</span>';
+}
+function levelBadge(l){
+  if(!l)return'';
+  const cls={Junior:'b-lv-jr',Mid:'b-lv-mid',Senior:'b-lv-sr'}[l]||'b-plat';
+  return`<span class="badge ${cls}">${l}</span>`;
+}
+function statusBadge(s){
+  return`<span class="badge b-status-${s}">${s}</span>`;
+}
+
+// ── Filtering ────────────────────────────────────────────
+const GAME_PLATFORMS = new Set(['greenhouse','lever','blizzard','2k','ea','bungie','epicgames','riotgames','insomniac','naughtydog','cdprojektred','netflix']);
+
+function filterJobs(jobs){
+  switch(activeChip){
+    case 'cin':    return jobs.filter(j=>j.category==='Cinematic Artist');
+    case 'vid':    return jobs.filter(j=>j.category==='Video Editor');
+    case 'mot':    return jobs.filter(j=>j.category==='Motion Designer');
+    case 'games':  return jobs.filter(j=>GAME_PLATFORMS.has(j.platform));
+    case 'br':     return jobs.filter(j=>j.region==='BR');
+    case 'gringa': return jobs.filter(j=>j.region==='International'||j.region==='Remote');
+    case 'replied':return jobs.filter(j=>j.status==='replied');
+    default:       return jobs.filter(j=>j.status!=='dismissed');
+  }
+}
+
+function setChip(key){
+  activeChip=key;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.dataset.chip===key));
+  renderCards(filterJobs(allJobs));
+}
+
+// ── Stats ────────────────────────────────────────────────
+function updateStats(jobs){
+  document.getElementById('sTotal').textContent=jobs.length;
+  document.getElementById('sReplied').textContent=jobs.filter(j=>j.status==='replied').length;
+  document.getElementById('sApplied').textContent=jobs.filter(j=>j.status==='applied').length;
+  document.getElementById('sBR').textContent=jobs.filter(j=>j.region==='BR').length;
+  document.getElementById('sCin').textContent=jobs.filter(j=>j.category==='Cinematic Artist').length;
+  document.getElementById('sVid').textContent=jobs.filter(j=>j.category==='Video Editor').length;
+  document.getElementById('sMot').textContent=jobs.filter(j=>j.category==='Motion Designer').length;
+}
+
+// ── Replied section ──────────────────────────────────────
+function renderReplied(jobs){
+  const replied=jobs.filter(j=>j.status==='replied');
+  const sec=document.getElementById('repliedSection');
+  const grid=document.getElementById('repliedGrid');
+  if(!replied.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  grid.innerHTML=replied.map(j=>{
+    const domain=extractDomain(j.url);
+    const gmailLink=`https://mail.google.com/mail/u/0/#search/${encodeURIComponent('from:'+domain)}`;
+    return`<div class="replied-card">
+      <div class="replied-company">${esc(j.company)}</div>
+      <div class="replied-title">${esc(j.title)}</div>
+      ${j.reply_subject?`<div class="replied-email">
+        <div class="replied-subject">"${esc(j.reply_subject)}"</div>
+        ${j.reply_sender?`<div class="replied-from">De: ${esc(j.reply_sender)}</div>`:''}
+        <div class="replied-date">${fmtDate(j.reply_date)}</div>
+      </div>`:''}
+      <div class="replied-actions">
+        <a href="${domain?gmailLink:'https://mail.google.com'}" target="_blank" rel="noopener">
+          <button class="btn-sm btn-gmail">Ver no Gmail ↗</button>
+        </a>
+        <button class="btn-sm btn-cl" onclick="openCL(${j.id},'${esc(j.title)}','${esc(j.company)}')">Letter</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function extractDomain(url){
+  try{return new URL(url).hostname.replace(/^www\./,'');}catch{return'';}
+}
+
+// ── Job cards ────────────────────────────────────────────
+function renderCards(jobs){
+  const el=document.getElementById('cards');
+  const cnt=document.getElementById('jobsCount');
+  cnt.textContent=`${jobs.length} job${jobs.length!==1?'s':''} found`;
+  if(!jobs.length){
+    el.innerHTML='<div class="empty"><h3>No jobs found</h3><p>Try a different filter or run the scraper.</p></div>';
+    return;
+  }
+  el.innerHTML=jobs.map(j=>`
+    <div class="card status-${j.status}" id="card-${j.id}">
+      <div class="card-top">
+        ${catBadge(j.category)}${levelBadge(j.level)}${regionBadge(j.region)}
+        <span class="badge b-plat">${esc(j.platform)}</span>
+        ${statusBadge(j.status)}
+      </div>
+      <div>
+        <div class="card-title"><a href="javascript:void(0)" onclick="window.open(${JSON.stringify(j.url)},'_blank','noopener,noreferrer')">${esc(j.title)}</a></div>
+        <div class="card-company">${esc(j.company)}${j.location?' · '+esc(j.location):''}</div>
+      </div>
+      <div class="card-meta">
+        <span>${fmtDate(j.date_found)}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-sm btn-save"   onclick="setStatus(${j.id},'saved')">Save</button>
+        <button class="btn-sm btn-app"    onclick="setStatus(${j.id},'applied')">Applied</button>
+        <button class="btn-sm btn-dis"    onclick="setStatus(${j.id},'dismissed')">Dismiss</button>
+        <button class="btn-sm btn-cl"     onclick="openCL(${j.id},'${esc(j.title)}','${esc(j.company)}')">Letter</button>
+        <button class="btn-sm btn-g"      onclick="window.open(${JSON.stringify(j.url)},'_blank','noopener,noreferrer')">Apply ↗</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── Data loading ─────────────────────────────────────────
+async function loadAll(){
+  const [jobsRes, statsRes] = await Promise.all([
+    fetch('/api/jobs').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/stats').then(r=>r.json()).catch(()=>({})),
+  ]);
+  allJobs=jobsRes;
+  updateStats(allJobs);
+  renderReplied(allJobs);
+  renderCards(filterJobs(allJobs));
+
+  // Scraper pill
+  const sc=statsRes.scraper||{};
+  const sp=document.getElementById('pScrape');
+  const sb=document.getElementById('btnScrape');
+  if(sc.running){
+    sp.textContent='Scraping...';sp.className='pill warn';sb.disabled=true;
+  } else {
+    sp.textContent=sc.last_run?`Scraped ${fmtDate(sc.last_run)} · +${sc.last_result?.new??0} new`:'Scraper: idle';
+    sp.className='pill';sb.disabled=false;
+  }
+
+  // Gmail pill
+  const gm=statsRes.gmail||{};
+  const gp=document.getElementById('pGmail');
+  const gb=document.getElementById('btnGmail');
+  if(gm.authorized===false){
+    gp.textContent='Gmail: no credentials';gp.className='pill';gb.disabled=true;
+  } else if(gm.last_run){
+    gp.textContent=`Gmail: ${gm.last_result?.matched??0} matched`;gp.className='pill ok';
+  } else {
+    gp.textContent='Gmail: ready';gp.className='pill ok';
+  }
+}
+
+// ── Actions ──────────────────────────────────────────────
+async function setStatus(id,status){
+  await fetch(`/api/jobs/${id}/status`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+  toast(`Marked as ${status}`);
+  await loadAll();
+}
+
+async function triggerScrape(){
+  document.getElementById('btnScrape').disabled=true;
+  await fetch('/api/scrape',{method:'POST'});
+  toast('Scraper started!');
+  scrapePoller=setInterval(async()=>{
+    const s=await fetch('/api/scrape/status').then(r=>r.json());
+    if(!s.running){clearInterval(scrapePoller);await loadAll();toast(`Done! +${s.last_result?.new??0} new jobs`);}
+    else await loadAll();
+  },3000);
+}
+
+async function triggerGmail(){
+  document.getElementById('btnGmail').disabled=true;
+  await fetch('/api/gmail/check',{method:'POST'});
+  toast('Gmail check started...');
+  let ticks=0;
+  gmailPoller=setInterval(async()=>{
+    ticks++;
+    const s=await fetch('/api/gmail/status').then(r=>r.json());
+    if(s.last_result||ticks>40){
+      clearInterval(gmailPoller);
+      document.getElementById('btnGmail').disabled=false;
+      const m=s.last_result?.matched??0;
+      await loadAll();
+      toast(m>0?`✉ ${m} ${m===1?'reply':'replies'} found!`:'Gmail done — no new replies');
+    }
+  },3000);
+}
+
+// ── Cover Letter ─────────────────────────────────────────
+async function openCL(id,title,company){
+  letterText='';
+  document.getElementById('clSub').textContent=`${title} @ ${company}`;
+  document.getElementById('clBody').innerHTML='<div class="cl-load"><span class="spin"></span>Generating with Claude...</div>';
+  document.getElementById('btnCopy').style.display='none';
+  document.getElementById('btnCopy').className='btn-sm btn-copy';
+  document.getElementById('clOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  try{
+    const r=await fetch(`/api/cover-letter/${id}`,{method:'POST'});
+    const d=await r.json();
+    if(!r.ok||d.error){
+      document.getElementById('clBody').innerHTML=`<div class="cl-err">Error: ${esc(d.error||'Unknown')}</div>`;
+      return;
+    }
+    letterText=d.text;
+    document.getElementById('clBody').innerHTML=`<div class="cl-text">${esc(d.text)}</div>`;
+    document.getElementById('btnCopy').style.display='inline-block';
+  }catch(e){
+    document.getElementById('clBody').innerHTML=`<div class="cl-err">${esc(String(e))}</div>`;
+  }
+}
+function closeCL(e){
+  if(e&&e.target!==document.getElementById('clOverlay'))return;
+  document.getElementById('clOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+async function copyLetter(){
+  if(!letterText)return;
+  await navigator.clipboard.writeText(letterText);
+  const b=document.getElementById('btnCopy');
+  b.textContent='Copied!';b.className='btn-sm btn-copy ok';
+  setTimeout(()=>{b.textContent='Copy';b.className='btn-sm btn-copy';},2000);
+}
+document.addEventListener('keydown',e=>e.key==='Escape'&&closeCL(null));
+
+// ── Init & auto-refresh ──────────────────────────────────
+loadAll();
+setInterval(loadAll, 5 * 60 * 1000); // refresh every 5 minutes
+</script>
+</body>
+</html>

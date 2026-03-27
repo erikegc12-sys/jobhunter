@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+playwright
+aiohttp
+apscheduler
+jinja2
+python-multipart
+beautifulsoup4
+lxml
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
+anthropic

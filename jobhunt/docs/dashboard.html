@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>jobhunt — Erik Gomes</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f18;--s1:#13151f;--s2:#1a1d2a;--s3:#22253a;
+  --b:#252840;--accent:#7c6af7;--a2:#5eead4;
+  --txt:#e2e8f0;--muted:#64748b;
+  --green:#22c55e;--red:#ef4444;--blue:#60a5fa;
+  --gold:#fbbf24;--purple:#c4b5fd;
+}
+body{background:var(--bg);color:var(--txt);font:14px/1.5 'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:var(--s1);border-bottom:1px solid var(--b);padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-wrap:wrap;gap:8px}
+.logo{font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-1px}
+.logo b{color:var(--a2)}
+.hright{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{font-size:11px;color:var(--muted);padding:4px 10px;background:var(--s2);border-radius:20px}
+.pill.ok{color:var(--green)}
+button{cursor:pointer;border:none;border-radius:6px;font-size:12px;font-weight:700;
+  padding:6px 14px;transition:opacity .15s;letter-spacing:.3px}
+button:hover{opacity:.8}
+.btn-p{background:var(--accent);color:#fff}
+.btn-sm{padding:3px 9px;font-size:11px;font-weight:600}
+.btn-g{background:#0f2a1e;color:var(--a2);border:1px solid #1a3d2a}
+.btn-dis{background:#2a1010;color:var(--red)}
+.stats{display:flex;gap:1px;background:var(--b);border-bottom:1px solid var(--b);overflow-x:auto}
+.stat{background:var(--s1);padding:14px 20px;flex:1;min-width:100px;cursor:pointer;
+  transition:background .15s;text-align:center;border-right:1px solid var(--b)}
+.stat:hover{background:var(--s2)}
+.stat:last-child{border-right:none}
+.stat-n{font-size:26px;font-weight:800;line-height:1}
+.stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.stat-n.accent{color:var(--accent)}
+.stat-n.green{color:var(--green)}
+.stat-n.gold{color:var(--gold)}
+.stat-n.blue{color:var(--blue)}
+.filters{padding:14px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  border-bottom:1px solid var(--b);background:var(--s1)}
+.chip{padding:5px 14px;border-radius:20px;border:1px solid var(--b);background:var(--s2);
+  color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:var(--accent);color:var(--txt)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.active.gold{background:#5a3800;border-color:var(--gold);color:var(--gold)}
+main{max-width:1400px;margin:0 auto;padding:20px 24px}
+.jobs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.jobs-count{font-size:12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.card{background:var(--s1);border:1px solid var(--b);border-radius:10px;
+  padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s}
+.card:hover{border-color:var(--accent)}
+.card-top{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.card-title{font-weight:700;font-size:14px;line-height:1.3}
+.card-title a{color:var(--txt);text-decoration:none;cursor:pointer}
+.card-title a:hover{color:var(--accent)}
+.card-company{font-size:12px;color:var(--muted)}
+.card-meta{font-size:11px;color:var(--muted)}
+.card-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.b-cat-cin{background:#2e1065;color:#c4b5fd}
+.b-cat-vid{background:#0c1a2e;color:#7dd3fc}
+.b-cat-mot{background:#0f2a1a;color:#6ee7b7}
+.b-cat-soc{background:#2a1020;color:#f9a8d4}
+.b-reg-br{background:#14532d;color:var(--green)}
+.b-reg-rem{background:#1d3a5f;color:var(--blue)}
+.b-reg-int{background:#2d1f00;color:#fb923c}
+.b-lv-jr{background:#0f2010;color:#86efac}
+.b-lv-mid{background:#1a1a10;color:#fde68a}
+.b-lv-sr{background:#200c10;color:#fca5a5}
+.b-plat{background:#1e2040;color:#a5b4fc}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty h3{font-size:18px;margin-bottom:8px;color:var(--txt)}
+.notice{background:var(--s2);border:1px solid var(--b);border-radius:8px;
+  padding:12px 16px;font-size:12px;color:var(--muted);margin-bottom:16px;text-align:center}
+.notice a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">job<b>hunt</b></div>
+  <div class="hright">
+    <span class="pill" id="pUpdated">Loading...</span>
+    <a href="https://github.com" target="_blank" rel="noopener">
+      <button class="btn-p btn-sm">GitHub ↗</button>
+    </a>
+  </div>
+</header>
+
+<div class="stats" id="statsBar">
+  <div class="stat" onclick="setChip('all')"><div class="stat-n accent" id="sTotal">—</div><div class="stat-l">Total</div></div>
+  <div class="stat" onclick="setChip('br')"><div class="stat-n blue" id="sBR">—</div><div class="stat-l">Brasil</div></div>
+  <div class="stat" onclick="setChip('cin')"><div class="stat-n" id="sCin">—</div><div class="stat-l">Cinematics</div></div>
+  <div class="stat" onclick="setChip('vid')"><div class="stat-n" id="sVid">—</div><div class="stat-l">Video Editor</div></div>
+  <div class="stat" onclick="setChip('mot')"><div class="stat-n" id="sMot">—</div><div class="stat-l">Motion</div></div>
+</div>
+
+<div class="filters">
+  <span class="chip active" data-chip="all"     onclick="setChip('all')">All</span>
+  <span class="chip"        data-chip="cin"     onclick="setChip('cin')">🎬 Cinematics</span>
+  <span class="chip"        data-chip="vid"     onclick="setChip('vid')">🎞 Video Editor</span>
+  <span class="chip"        data-chip="mot"     onclick="setChip('mot')">✨ Motion</span>
+  <span class="chip"        data-chip="games"   onclick="setChip('games')">🎮 Games</span>
+  <span class="chip"        data-chip="br"      onclick="setChip('br')">🇧🇷 BR</span>
+  <span class="chip"        data-chip="gringa"  onclick="setChip('gringa')">🌎 Gringa</span>
+</div>
+
+<main>
+  <div class="notice" id="notice" style="display:none">
+    Data snapshot — run <code>python export_static.py</code> locally to refresh.
+  </div>
+  <div class="jobs-header">
+    <div class="jobs-count" id="jobsCount">Loading...</div>
+  </div>
+  <div class="cards" id="cards">
+    <div class="empty"><h3>Loading...</h3></div>
+  </div>
+</main>
+
+<script>
+'use strict';
+let activeChip = 'all';
+let allJobs = [];
+
+const GAME_PLATFORMS = new Set(['greenhouse','lever','blizzard','2k','ea','bungie','epicgames','riotgames','insomniac','naughtydog']);
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+
+function fmtDate(iso){
+  if(!iso)return'—';
+  return new Date(iso.endsWith('Z')?iso:iso+'Z').toLocaleDateString('pt-BR');
+}
+
+function catBadge(c){
+  const map={'Cinematic Artist':['b-cat-cin','Cinematic'],'Video Editor':['b-cat-vid','Video Ed.'],
+    'Motion Designer':['b-cat-mot','Motion'],'Social Media Editor':['b-cat-soc','Social']};
+  const [cls,label]=(map[c]||['b-plat',c]);
+  return`<span class="badge ${cls}">${esc(label)}</span>`;
+}
+function regionBadge(r){
+  if(r==='BR')return'<span class="badge b-reg-br">🇧🇷 BR</span>';
+  if(r==='Remote')return'<span class="badge b-reg-rem">Remote</span>';
+  return'<span class="badge b-reg-int">Intl</span>';
+}
+function levelBadge(l){
+  if(!l)return'';
+  const cls={Junior:'b-lv-jr',Mid:'b-lv-mid',Senior:'b-lv-sr'}[l]||'b-plat';
+  return`<span class="badge ${cls}">${l}</span>`;
+}
+
+function filterJobs(jobs){
+  switch(activeChip){
+    case 'cin':    return jobs.filter(j=>j.category==='Cinematic Artist');
+    case 'vid':    return jobs.filter(j=>j.category==='Video Editor');
+    case 'mot':    return jobs.filter(j=>j.category==='Motion Designer');
+    case 'games':  return jobs.filter(j=>GAME_PLATFORMS.has(j.platform));
+    case 'br':     return jobs.filter(j=>j.region==='BR');
+    case 'gringa': return jobs.filter(j=>j.region==='International'||j.region==='Remote');
+    default:       return jobs;
+  }
+}
+
+function setChip(key){
+  activeChip=key;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.dataset.chip===key));
+  renderCards(filterJobs(allJobs));
+}
+
+function updateStats(jobs){
+  document.getElementById('sTotal').textContent=jobs.length;
+  document.getElementById('sBR').textContent=jobs.filter(j=>j.region==='BR').length;
+  document.getElementById('sCin').textContent=jobs.filter(j=>j.category==='Cinematic Artist').length;
+  document.getElementById('sVid').textContent=jobs.filter(j=>j.category==='Video Editor').length;
+  document.getElementById('sMot').textContent=jobs.filter(j=>j.category==='Motion Designer').length;
+}
+
+function renderCards(jobs){
+  const el=document.getElementById('cards');
+  const cnt=document.getElementById('jobsCount');
+  cnt.textContent=`${jobs.length} job${jobs.length!==1?'s':''} found`;
+  if(!jobs.length){
+    el.innerHTML='<div class="empty"><h3>No jobs found</h3><p>Try a different filter.</p></div>';
+    return;
+  }
+  el.innerHTML=jobs.map(j=>`
+    <div class="card">
+      <div class="card-top">
+        ${catBadge(j.category)}${levelBadge(j.level)}${regionBadge(j.region)}
+        <span class="badge b-plat">${esc(j.platform)}</span>
+      </div>
+      <div>
+        <div class="card-title"><a href="javascript:void(0)" onclick="window.open(${JSON.stringify(j.url)},'_blank','noopener,noreferrer')">${esc(j.title)}</a></div>
+        <div class="card-company">${esc(j.company)}${j.location?' · '+esc(j.location):''}</div>
+      </div>
+      <div class="card-meta">${fmtDate(j.date_found)}</div>
+      <div class="card-actions">
+        <button class="btn-sm btn-g" onclick="window.open(${JSON.stringify(j.url)},'_blank','noopener,noreferrer')">Apply ↗</button>
+      </div>
+    </div>`).join('');
+}
+
+async function loadData(){
+  try{
+    const data = await fetch('./jobs.json').then(r=>r.json());
+    allJobs = data.jobs || [];
+    const updated = data.last_updated;
+    const pil = document.getElementById('pUpdated');
+    pil.textContent = updated ? `Updated ${fmtDate(updated)}` : 'No data yet';
+    pil.className = allJobs.length ? 'pill ok' : 'pill';
+    if(allJobs.length) document.getElementById('notice').style.display='block';
+    updateStats(allJobs);
+    renderCards(filterJobs(allJobs));
+  }catch(e){
+    document.getElementById('cards').innerHTML='<div class="empty"><h3>No data</h3><p>Run <code>python export_static.py</code> first.</p></div>';
+    document.getElementById('jobsCount').textContent='0 jobs found';
+    document.getElementById('pUpdated').textContent='No data';
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
